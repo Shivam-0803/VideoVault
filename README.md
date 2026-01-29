@@ -44,4 +44,4 @@ The backend uses FFmpeg for transcoding and Socket.IO for real-time progress. On
 - **What still works in production:** Upload flow, UI, real-time socket logic, and playback of any already-processed or direct-served assets. Users can upload and see status; processing simply does not run on the free-tier instance.
 - **Full processing** (transcode + thumbnails + progress) works when running **locally** or on **Render Starter** (or any host with ~1GB+ RAM). Use the same codebase; only the deployment constraints differ.
 
-**Interview explanation:** “We disabled FFmpeg on the free-tier backend to stay within 512MB; the rest of the stack is unchanged and processing runs on local or paid hosting.”
+** “We disabled FFmpeg on the free-tier backend to stay within 512MB; the rest of the stack is unchanged and processing runs on local or paid hosting.”
