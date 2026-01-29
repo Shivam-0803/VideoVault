@@ -17,17 +17,22 @@ const server = http.createServer(app);
 connectDb().then(() => {
   initSocket(server);
 
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'https://video-vault-hazel.vercel.app'
+  ];
+  
   app.use(cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true); // allow server-to-server
       if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
+        return callback(null, true);
       }
+      return callback(new Error('Not allowed by CORS'));
     },
-    credentials: true
+    credentials: true,
   }));
+  
   app.use(express.json());
 
   app.use('/auth', authRoutes);
