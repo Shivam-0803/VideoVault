@@ -14,26 +14,24 @@ import userRoutes from './routes/userRoutes.js';
 const app = express();
 const server = http.createServer(app);
 
-connectDb().then(() => {
-  initSocket(server);
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://video-vault-hazel.vercel.app',
+];
 
-  const allowedOrigins = [
-    'http://localhost:5173',
-    'https://video-vault-hazel.vercel.app'
-  ];
-  
+connectDb().then(() => {
   app.use(cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // allow server-to-server
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
       return callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
+    optionsSuccessStatus: 204,
   }));
-  
   app.use(express.json());
+
+  initSocket(server, allowedOrigins);
 
   app.use('/auth', authRoutes);
   app.use('/videos', videoRoutes);

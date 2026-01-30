@@ -4,19 +4,22 @@ import User from '../models/User.js';
 
 let io = null;
 
-export function initSocket(httpServer, app) {
-  const origin = process.env.FRONTEND_URL || 'http://localhost:5173';
+export function initSocket(httpServer, allowedOrigins) {
+  const origins = Array.isArray(allowedOrigins) && allowedOrigins.length
+    ? allowedOrigins
+    : ['http://localhost:5173', 'https://video-vault-hazel.vercel.app'];
 
   io = new Server(httpServer, {
     cors: {
-      origin,
+      origin: (origin, callback) => {
+        if (!origin || origins.includes(origin)) return callback(null, true);
+        return callback(new Error('Not allowed by CORS'));
+      },
       credentials: true,
       methods: ['GET', 'POST'],
     },
-    transports: ['polling'], // ✅ IMPORTANT (Render free tier fix)
+    transports: ['websocket'],
   });
-
-  if (app) app.set('io', io);
 
   io.use(async (socket, next) => {
     try {
@@ -41,18 +44,34 @@ export function initSocket(httpServer, app) {
   });
 
   io.on('connection', (socket) => {
-    console.log('Socket connected:', socket.id);
+    try {
+      console.log('Socket connected:', socket.id);
+    } catch (err) {
+      console.error('Socket connection log:', err.message);
+    }
 
     socket.on('join-video', (videoId) => {
-      socket.join(`video-${videoId}`);
+      try {
+        socket.join(`video-${videoId}`);
+      } catch (err) {
+        console.error('join-video:', err.message);
+      }
     });
 
     socket.on('leave-video', (videoId) => {
-      socket.leave(`video-${videoId}`);
+      try {
+        socket.leave(`video-${videoId}`);
+      } catch (err) {
+        console.error('leave-video:', err.message);
+      }
     });
 
     socket.on('disconnect', () => {
-      console.log('Socket disconnected:', socket.id);
+      try {
+        console.log('Socket disconnected:', socket.id);
+      } catch (err) {
+        console.error('Socket disconnect log:', err.message);
+      }
     });
   });
 
@@ -60,6 +79,5 @@ export function initSocket(httpServer, app) {
 }
 
 export function getIo() {
-  if (!io) throw new Error('Socket.io not initialized');
-  return io;
+  return io ?? null;
 }

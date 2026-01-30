@@ -123,8 +123,8 @@ export default function Player() {
           {video.status === 'failed' ? (
             <div className="flex flex-col items-center gap-3">
               <AlertCircle className="w-12 h-12 text-red-400 dark:text-red-500" />
-              <p className="text-zinc-700 dark:text-zinc-300 font-medium">Processing failed</p>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">This video could not be processed. Try uploading again.</p>
+              <p className="text-zinc-700 dark:text-zinc-300 font-medium">Processing may be delayed</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">Processing may be delayed due to hosting limits. You can try again later or upload again.</p>
             </div>
           ) : (
             <div className="max-w-sm mx-auto">
